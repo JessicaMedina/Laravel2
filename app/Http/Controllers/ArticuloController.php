@@ -6,66 +6,102 @@ use Illuminate\Http\Request;
 
 use sisVentas\Http\Requests;
 use Illuminate\support\Facades\Redirect;
-use Illuminate\support\Facades\input;
-use sisVentas\Http\Request\ArticuloFormRequest;
+use Illuminate\support\Facades\Input;
+use sisVentas\Http\Requests\ArticuloFormRequest;
 use sisVentas\Articulo;
 use DB;
 
 
 class ArticuloController extends Controller{
 
-     public function __construct()
-    {
+     public function __construct(){
 
     }
-    public function index(Request $request)
-    {
-        if ($request)
-        {
+
+    public function index(Request $request){
+        if ($request) {
+
             $query=trim($request->get('searchText'));
-            $categorias=DB::table('categoria')->where('nombre','LIKE','%'.$query.'%')
-            ->where ('condicion','=','0')
-            ->orderBy('idcategoria','asc')
+            $articulos=DB::table('Articulo as a')
+            ->join('categoria as c','a.idcategoria','=','c.idcategoria')
+            ->select('a.idarticulo','a.nombre','a.codigo','a.stock','c.nombre as categoria','a.descripcion','a.imagen','a.estado')
+            ->where('a.nombre','LIKE','%'.$query.'%')
+            ->orwhere('a.codigo','LIKE','%'.$query.'%')
+            ->orderBy('idarticulo','asc')
             ->paginate(7);
-            return view('almacen.categoria.index',["categorias"=>$categorias,"searchText"=>$query]);
+            return view('almacen.articulo.index',["articulos"=>$articulos,"searchText"=>$query]);
         }
     }
-    public function create()
-    {
-        return view("almacen.categoria.create");
+    public function create(){
+
+        $categorias=DB::table('categoria')->where('condicion','=','1')->get();
+        return view("almacen.articulo.create",["categorias"=>$categorias]);
     }
-    public function store (CategoriaFormRequest $request)
-    {
-        $categoria=new Categoria;
-        $categoria->nombre=$request->get('nombre');
-        $categoria->descripcion=$request->get('descripcion');
-        $categoria->condicion='0';
-        $categoria->save();
-        return Redirect::to('almacen/categoria');
+
+
+    public function store (ArticuloFormRequest $request){
+
+        $articulo=new Articulo;
+        $articulo->idcategoria=$request->get('idcategoria');
+        $articulo->codigo=$request->get('codigo');
+        $articulo->nombre=$request->get('nombre');
+        $articulo->stock=$request->get('stock');
+        $articulo->descripcion=$request->get('descripcion');
+        $articulo->estado='Activo';
+
+
+        if(Input::hasFile('imagen')){
+            $file=Input::file('imagen');
+            $file->move(public_path().'/imagenes/articulos/', $file->getClientOriginalName());
+            $articulo->imagen=$file->getClientOriginalName();     
+        }
+        $articulo->save();
+   
+        return Redirect::to('almacen/articulo');
 
     }
-    public function show($id)
-    {
-        return view("almacen.categoria.show",["categoria"=>Categoria::findOrFail($id)]);
+    public function show($id){
+
+        return view("almacen.articulo.show",["articulo"=>Articulo::findOrFail($id)]);
     }
-    public function edit($id)
-    {
-        return view("almacen.categoria.edit",["categoria"=>Categoria::findOrFail($id)]);
+
+    public function edit($id){
+
+
+        $articulo=Articulo::findOrFail($id);
+        $categorias=DB::table('categoria')->where('condicion','=','1')->get();
+
+        return view("almacen.articulo.edit",["articulo"=>$articulo,"categorias"=>$categorias]);
     }
-    public function update(CategoriaFormRequest $request,$id)
-    {
-        $categoria=Categoria::findOrFail($id);
-        $categoria->nombre=$request->get('nombre');
-        $categoria->descripcion=$request->get('descripcion');
-        $categoria->update();
-        return Redirect::to('almacen/categoria');
+
+
+    public function update(ArticuloFormRequest $request,$id){
+
+        $articulo=Articulo::findOrFail($id);
+
+        $articulo->idcategoria=$request->get('idcategoria');
+        $articulo->codigo=$request->get('codigo');
+        $articulo->nombre=$request->get('nombre');
+        $articulo->stock=$request->get('stock');
+        $articulo->descripcion=$request->get('descripcion');
+       
+        if(Input::hasFile('imagen')){
+            $file=Input::file('imagen');
+            $file->move(public_path(). 'imagenes/articulos/', $file->getClientOriginalName());
+            $articulo->imagen=$file->getClientOriginalName();     
+        }
+
+      
+        $articulo->update();
+        return Redirect::to('almacen/articulo');
     }
-    public function destroy($id)
-    {
-        $categoria=Categoria::findOrFail($id);
-        $categoria->condicion='1';
-        $categoria->update();
-        return Redirect::to('almacen/categoria');
+
+    public function destroy($id){
+
+        $articulo=Articulo::findOrFail($id);
+        $articulo->estado='Inactivo';
+        $articulo->update();
+        return Redirect::to('almacen/articulo');
     }
 
 }

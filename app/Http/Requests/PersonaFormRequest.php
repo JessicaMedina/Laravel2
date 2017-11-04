@@ -4,7 +4,7 @@ namespace sisVentas\Http\Requests;
 
 use sisVentas\Http\Requests\Request;
 
-class ArticuloFormRequest extends Request
+class PersonaFormRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +13,7 @@ class ArticuloFormRequest extends Request
      */
     public function authorize()
     {
-        return true;
+        return false;
     }
 
     /**
@@ -24,13 +24,7 @@ class ArticuloFormRequest extends Request
     public function rules()
     {
         return [
-            'idcategoria'=>'required',
-            'codigo'=>'required|max:50',
-             'nombre'=>'required|max:100',
-              'stock'=>'required|numeric',
-               'descripcion'=>'max:512',
-                'image'=>'mimes:jpeg,bmp,png,jpg',
-
+            //
         ];
     }
 }

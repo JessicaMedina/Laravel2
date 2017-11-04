@@ -11,7 +11,8 @@ use sisVentas\Http\Requests\CategoriaFormRequest;
 use DB;
 
 
-class CategoriaController extends Controller {
+class CategoriaController extends Controller
+{
     public function __construct()
     {
 
@@ -22,8 +23,8 @@ class CategoriaController extends Controller {
         {
             $query=trim($request->get('searchText'));
             $categorias=DB::table('categoria')->where('nombre','LIKE','%'.$query.'%')
-            ->where ('condicion','=','0')
-            ->orderBy('idcategoria','asc')
+            ->where ('condicion','=','1')
+            ->orderBy('idcategoria','desc')
             ->paginate(7);
             return view('almacen.categoria.index',["categorias"=>$categorias,"searchText"=>$query]);
         }
@@ -37,7 +38,7 @@ class CategoriaController extends Controller {
         $categoria=new Categoria;
         $categoria->nombre=$request->get('nombre');
         $categoria->descripcion=$request->get('descripcion');
-        $categoria->condicion='0';
+        $categoria->condicion='1';
         $categoria->save();
         return Redirect::to('almacen/categoria');
 
@@ -61,7 +62,7 @@ class CategoriaController extends Controller {
     public function destroy($id)
     {
         $categoria=Categoria::findOrFail($id);
-        $categoria->condicion='1';
+        $categoria->condicion='0';
         $categoria->update();
         return Redirect::to('almacen/categoria');
     }
