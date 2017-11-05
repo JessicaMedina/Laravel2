@@ -4,7 +4,7 @@ namespace sisVentas\Http\Requests;
 
 use sisVentas\Http\Requests\Request;
 
-class PersonaFormRequest extends Request
+class IngresoFormRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,12 +24,13 @@ class PersonaFormRequest extends Request
     public function rules()
     {
         return [
-            'nombre'=>'required|max:100',
-            'tipo_documento'=>'required|max:20',
-            'num_documento'=>'required|max:15',
-             'direccion'=>'required|max:70',
-             'telefono'=>'required|max:15',
-             'email'=>'required|max:15'
+            'idproveedor'=>'required',
+            'tipo_comprobante'=>'required|max:20',
+            'serie_comprobante'=>'required|max:10',
+            'num_comprobante'=>'required|max:20',
+            'idarticulo'=>'required',
+            'precio_compra'=>'required',
+            'precio_venta'=>'required'
 
         ];
     }
