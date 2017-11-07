@@ -15,22 +15,20 @@
 					
 					<th>Fecha</th>
 					<th>Proveedor</th>
-				    <th>Tipo Comprobante</th>
-				    <th>Serie Comprobante</th>	
-				    <th>Numero Comprobante</th>
+				    <th>Comprobante</th>
+				    
 				    <th>Impuesto</th>
 				    <th>Total </th>
 				    <th>Estado</th>
 				    <th>Opciones</th>
 				</thead>
-               @foreach ($ingreso as $ing)
+               @foreach ($ingresos as $ing)
 
 				
 				<td>{{ $ing->fecha_hora}}</td>
 				<td>{{ $ing->nombre}}</td>
-				<td>{{ $ing->tipo_comprobante}}</td>
-				<td>{{ $ing->serie_comprobante}}</td>
-				<td>{{ $ing->num_comprobante}}</td>
+				<td>{{ $ing->tipo_comprobante. ': '.$ing->serie_comprobante. '-' .$ing->num_comprobante}}</td>
+				
 				<td>{{ $ing->impuesto}}</td>
 				<td>{{ $ing->total}}</td>
 				<td>{{ $ing->estado}}</td>
