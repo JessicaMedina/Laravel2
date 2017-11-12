@@ -19,8 +19,9 @@ use Illuminate\Support\Collection;
 
 class IngresoController extends Controller
 {
-    public function __construct()
-    {
+    public function __construct(){
+
+        $this->middleware('auth');
 
     }
 
@@ -97,22 +98,28 @@ class IngresoController extends Controller
         return Redirect::to('compras/ingreso');
     }
 
-    public function show($id)
+     public function show($id)
     {
-        $ingreso=DB::table('ingreso as i')
-            ->join('persona as p','i.idproveedor','=','p.idpersona')
-            ->join('detalle_ingreso as di','i.idingreso','=','di.idingreso')
-            ->select('i.idingreso','i.fecha_hora','p.nombre','i.tipo_comprobante','i.serie_comprobante','i.num_comprobante','i.impuesto','i.estado',DB::raw('sum(di.cantidad*precio_compra) as total'))
-            ->where('i.idingreso','=','$id')
-            ->first(); // Arriba ya se utilizo group by, acá utilizar first para traer únicamente el primero.
 
+        $ingreso = DB::table('ingreso as i')
+            ->join('persona as p', 'i.idproveedor','=', 'p.idpersona')
+            ->join('detalle_ingreso as di', 'i.idingreso', '=', 'di.idingreso')
+
+           ->select('i.idingreso', 'i.fecha_hora', 'p.nombre', 'i.tipo_comprobante', 'i.serie_comprobante', 'i.num_comprobante', 'i.impuesto', 'i.estado',DB::raw('sum(di.cantidad*precio_compra) as total'))
+           ->groupBy('i.idingreso', 'i.fecha_hora', 'p.nombre', 'i.tipo_comprobante', 'i.serie_comprobante', 'i.num_comprobante', 'i.impuesto', 'i.estado')
+            ->where('i.idingreso','=', $id)
+            ->first();
+                      
+                    
         $detalles=DB::table('detalle_ingreso as d')
             ->join('articulo as a','d.idarticulo','=','a.idarticulo')
             ->select('a.nombre as articulo','d.cantidad','d.precio_compra','d.precio_venta')
             ->where('d.idingreso','=',$id)
             ->get();
-        return view("compras.ingreso.show",["ingreso"=>$ingreso,"detalles"=>$detalles]);
-    }
+
+        return view("compras.ingreso.show", ["ingreso"=>$ingreso,"detalles"=>$detalles]);
+
+}
 
     public function destroy($id)
     {
